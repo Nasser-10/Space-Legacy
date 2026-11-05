@@ -83,3 +83,13 @@ def test_evidence_check_rejects_unrelated_claims():
 
 def test_unknown_source_has_no_fabricated_citation():
     assert RAGService._citation_for("unlisted_document.md") is None
+
+def test_arabic_diacritics_and_alef_variants_are_normalized():
+    tokens = _tokens("إِبْرَاهِيم يسأل عن القمر")
+    assert "ابراهيم" in tokens
+    assert "القمر" in tokens
+    assert "moon" in tokens
+
+
+def test_arabic_alef_variants_match_archive_terms():
+    assert _tokens("آبولو") & _tokens("أبولو")
