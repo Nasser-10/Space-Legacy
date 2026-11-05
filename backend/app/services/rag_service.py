@@ -65,7 +65,7 @@ STOP_WORDS = {
 
 def _tokens(text: str) -> set[str]:
     tokens = {
-        token for token in re.findall(r"[\\w]+", text.casefold(), flags=re.UNICODE)
+        token for token in re.findall(r"[\w]+", text.casefold(), flags=re.UNICODE)
         if len(token) > 2 and token not in STOP_WORDS
     }
     expanded = set(tokens)
