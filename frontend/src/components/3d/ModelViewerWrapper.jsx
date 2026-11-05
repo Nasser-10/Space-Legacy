@@ -141,16 +141,16 @@ export default function ModelViewerWrapper({
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:24px_24px] opacity-20 z-10" />
       )}
 
-      {/* Top Left: Mission Control Telemetry HUD */}
+      {/* Top Left: Model viewer status panel */}
       <div className="absolute top-3 left-3 z-20 flex flex-col gap-1 pointer-events-none">
         <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md border border-slate-800 text-[10px] text-cyan-400 font-mono">
           <Crosshair className="w-3 h-3 text-cyan-400 animate-spin" />
-          <span>{lang === 'ar' ? 'فحص تيليمتري حي 3D' : 'REAL-TIME 3D TELEMETRY'}</span>
+          <span>{lang === 'ar' ? 'عارض نموذج ثلاثي الأبعاد' : '3D MODEL VIEWER'}</span>
         </div>
         <div className="px-3 py-1.5 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800/80 text-[10px] text-slate-400 font-mono space-y-0.5">
-          <div>ASSET: <span className="text-slate-200">NASA OFFICIAL GLB</span></div>
+          <div>ASSET: <span className="text-slate-200">3D MODEL</span></div>
           <div>MODE: <span className="text-cyan-400 uppercase">{lightingMode}</span></div>
-          <div>AR READY: <span className="text-emerald-400">ENABLED</span></div>
+          <div>AR: <span className="text-emerald-400">SUPPORTED DEVICE REQUIRED</span></div>
         </div>
       </div>
 

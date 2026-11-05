@@ -23,10 +23,10 @@ SOURCE_CATALOG = {
     },
     "sojourner_pathfinder.md": {
         "equipment_id": "sojourner",
-        "title": "Mars Pathfinder Microrover Operations",
-        "author": "NASA Jet Propulsion Laboratory",
+        "title": "Mars Pathfinder Mission Archive",
+        "author": "NASA / Jet Propulsion Laboratory",
         "year": "1997",
-        "url": "https://mars.nasa.gov/resources/pathfinder-status",
+        "url": "https://science.nasa.gov/mission/mars-pathfinder/",
     },
     "planetary_protection_and_heritage.md": {
         "equipment_id": "all",
@@ -44,6 +44,49 @@ SPACE_KEYWORDS = {
     "instrument", "battery", "solar", "apxs", "rtg", "space", "planet",
     "astronomy", "astronaut", "satellite", "survey", "opportunity",
 }
+ARABIC_QUERY_EXPANSIONS = {
+    "القمر": {"moon", "lunar"}, "قمري": {"lunar"}, "المريخ": {"mars", "martian"},
+    "مريخي": {"martian"}, "ابولو": {"apollo"}, "أبولو": {"apollo"},
+    "فيكنج": {"viking"}, "فايكنج": {"viking"}, "سوجورنر": {"sojourner"},
+    "باثفايندر": {"pathfinder"}, "روفر": {"rover"}, "مركبة": {"spacecraft"},
+    "المركبة": {"spacecraft"}, "مسبار": {"spacecraft", "lander"}, "المسبار": {"spacecraft", "lander"},
+    "الهبوط": {"landing"}, "مرحلة": {"stage"}, "مهمة": {"mission"}, "المهمة": {"mission"},
+    "ناسا": {"nasa"}, "صاروخ": {"rocket"}, "مدار": {"orbit"},
+    "محرك": {"engine"}, "بطارية": {"battery"},
+}
+STOP_WORDS = {
+    "what", "when", "where", "which", "who", "why", "how", "does", "did",
+    "was", "were", "the", "and", "for", "with", "from", "this", "that",
+    "its", "their", "about", "tell", "explain", "can", "could", "please",
+    "هل", "ما", "ماذا", "متى", "أين", "اين", "كيف", "لماذا", "هو", "هي",
+    "من", "عن", "في", "على", "إلى", "الى", "كان", "كانت", "مع", "هذا", "هذه",
+}
+
+
+def _tokens(text: str) -> set[str]:
+    tokens = {
+        token for token in re.findall(r"[\w]+", text.casefold(), flags=re.UNICODE)
+        if len(token) > 2 and token not in STOP_WORDS
+    }
+    expanded = set(tokens)
+    for token in tokens:
+        expanded.update(ARABIC_QUERY_EXPANSIONS.get(token, set()))
+    return expanded
+
+
+def _answer_has_evidence(answer: str, chunks: List[str]) -> bool:
+    """Conservative lexical support check; not a substitute for human fact-checking."""
+    evidence = _tokens(" ".join(chunks))
+    claims = [
+        sentence.strip() for sentence in re.split(r"(?<=[.!?؟])\s+|\n+", answer)
+        if len(_tokens(sentence)) >= 4
+    ]
+    if not evidence or not claims:
+        return False
+    return all(
+        len(_tokens(claim) & evidence) / max(1, len(_tokens(claim))) >= 0.35
+        for claim in claims
+    )
 
 
 class RAGService:
@@ -60,28 +103,28 @@ class RAGService:
             chroma_dir = Path(settings.CHROMA_PERSIST_DIR)
             if not chroma_dir.exists():
                 return
-
             self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
             embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-                model_name=settings.EMBEDDING_MODEL_NAME.split("/")[-1]
+                model_name=settings.EMBEDDING_MODEL_NAME
             )
             self.collection = self.chroma_client.get_collection(
-                name="nasa_space_legacy",
-                embedding_function=embedding_fn,
+                name="nasa_space_legacy", embedding_function=embedding_fn
             )
         except Exception:
-            # The document-based keyword retriever remains available if Chroma
-            # is missing, empty, or has not been built yet.
             self.collection = None
 
     @staticmethod
-    def _citation_for(source_file: str) -> SourceCitation:
-        metadata = SOURCE_CATALOG.get(source_file, {})
+    def _citation_for(source_file: str, metadata: Dict[str, Any] | None = None):
+        catalog = SOURCE_CATALOG.get(source_file)
+        metadata = metadata or {}
+        # Unknown sources are deliberately not turned into generic NASA citations.
+        if not catalog:
+            return None
         return SourceCitation(
-            title=metadata.get("title", Path(source_file).stem.replace("_", " ").title()),
-            author=metadata.get("author", "NASA"),
-            year=metadata.get("year", "Historical archive"),
-            url=metadata.get("url", "https://www.nasa.gov/"),
+            title=str(metadata.get("document_title") or catalog["title"]),
+            author=str(metadata.get("source_author") or catalog["author"]),
+            year=str(metadata.get("source_year") or catalog["year"]),
+            url=str(metadata.get("source_url") or catalog["url"]),
         )
 
     def _fallback_keyword_search(
@@ -90,48 +133,39 @@ class RAGService:
         docs_dir = Path(settings.DOCUMENTS_DIR)
         if not docs_dir.exists():
             return []
-
-        stop_words = {
-            "what", "when", "where", "which", "who", "why", "how", "does",
-            "did", "was", "were", "the", "and", "for", "with", "from", "this",
-            "that", "its", "their", "about", "tell", "explain", "can", "could",
-        }
-        words = {
-            word for word in re.findall(r"\w+", query.lower())
-            if len(word) > 2 and word not in stop_words
-        }
+        query_tokens = _tokens(query)
+        if not query_tokens:
+            return []
         results = []
-
         for md_file in docs_dir.glob("*.md"):
-            source = SOURCE_CATALOG.get(md_file.name, {})
-            source_equipment_id = source.get("equipment_id", "all")
+            source = SOURCE_CATALOG.get(md_file.name)
+            if not source:
+                continue
+            source_equipment_id = source["equipment_id"]
             if equipment_id != "all" and source_equipment_id not in {equipment_id, "all"}:
                 continue
-
             content = md_file.read_text(encoding="utf-8")
             sections = re.split(r"\n(?=#{1,3}\s)", content)
             for section in sections:
-                section_lower = section.lower()
-                score = sum(1 for word in words if word in section_lower)
-                if source_equipment_id == equipment_id and equipment_id != "all":
-                    score += 2
-                if score > 0:
-                    results.append({
-                        "document": section.strip(),
-                        "score": score,
-                        "metadata": {"source_file": md_file.name},
-                    })
-
+                section_tokens = _tokens(section)
+                overlap = query_tokens & section_tokens
+                if not overlap:
+                    continue
+                # Relevance must come from actual query/document overlap. Exhibit
+                # selection is a filter, never an artificial score bonus.
+                score = len(overlap) / (len(query_tokens) ** 0.5)
+                results.append({
+                    "document": section.strip(),
+                    "score": score,
+                    "metadata": {"source_file": md_file.name},
+                })
         results.sort(key=lambda item: item["score"], reverse=True)
         return results[:top_k]
 
     def retrieve_context(
         self, question: str, equipment_id: str
     ) -> Tuple[List[str], List[SourceCitation]]:
-        retrieved_texts: List[str] = []
-        citations: List[SourceCitation] = []
-        seen_sources = set()
-
+        candidates: List[Tuple[str, Dict[str, Any], float]] = []
         if self.collection is not None:
             try:
                 count = self.collection.count()
@@ -139,45 +173,48 @@ class RAGService:
                     where_filter = None
                     if equipment_id != "all":
                         where_filter = {"equipment_id": {"$in": [equipment_id, "all"]}}
-                    results = self.collection.query(
+                    result = self.collection.query(
                         query_texts=[question],
-                        n_results=min(4, count),
+                        n_results=min(6, count),
                         where=where_filter,
+                        include=["documents", "metadatas", "distances"],
                     )
-                    documents = (results.get("documents") or [[]])[0]
-                    metadatas = (results.get("metadatas") or [[]])[0]
-                    for document, metadata in zip(documents, metadatas):
-                        if not document:
-                            continue
-                        retrieved_texts.append(document)
-                        source_file = (metadata or {}).get("source_file", "")
-                        citation = self._citation_for(source_file)
-                        if citation.url not in seen_sources:
-                            citations.append(citation)
-                            seen_sources.add(citation.url)
+                    docs = (result.get("documents") or [[]])[0]
+                    metas = (result.get("metadatas") or [[]])[0]
+                    distances = (result.get("distances") or [[]])[0]
+                    max_distance = float(settings.RAG_MAX_DISTANCE)
+                    for doc, meta, distance in zip(docs, metas, distances):
+                        if doc and distance is not None and float(distance) <= max_distance:
+                            candidates.append((doc, meta or {}, float(distance)))
             except Exception:
-                # Fall back to raw Markdown files on any index/query issue.
-                retrieved_texts = []
-                citations = []
+                candidates = []
 
-        if not retrieved_texts:
-            for result in self._fallback_keyword_search(question, equipment_id):
-                retrieved_texts.append(result["document"])
-                source_file = result["metadata"]["source_file"]
-                citation = self._citation_for(source_file)
-                if citation.url not in seen_sources:
-                    citations.append(citation)
-                    seen_sources.add(citation.url)
+        if candidates:
+            candidates.sort(key=lambda item: item[2])
+            selected = candidates[:4]
+        else:
+            fallback = self._fallback_keyword_search(question, equipment_id)
+            selected = [
+                (item["document"], item["metadata"], 0.0)
+                for item in fallback
+            ]
 
-        return retrieved_texts, citations
+        texts, citations, seen = [], [], set()
+        for document, metadata, _ in selected:
+            source_file = str(metadata.get("source_file") or "")
+            citation = self._citation_for(source_file, metadata)
+            # Do not return unsupported excerpts or fabricate a homepage citation.
+            if not citation:
+                continue
+            texts.append(document)
+            if citation.url not in seen:
+                citations.append(citation)
+                seen.add(citation.url)
+        return texts, citations
 
     def ask(self, req: AIQuestionRequest) -> AIQuestionResponse:
         level = req.level if req.level in {"kid", "explorer", "scientist"} else "explorer"
-
-        # For the global chat, reject clearly unrelated questions. In an
-        # equipment-specific chat, short follow-ups such as "why was it left?"
-        # are valid because the selected exhibit supplies the subject.
-        query_words = set(re.findall(r"\w+", req.question.lower()))
+        query_words = _tokens(req.question)
         if req.equipment_id == "all" and not query_words.intersection(SPACE_KEYWORDS):
             return AIQuestionResponse(
                 answer=(
@@ -185,73 +222,50 @@ class RAGService:
                     "NASA missions, lunar and Martian equipment, mission history, "
                     "and the science behind these explorers."
                 ),
-                sources=[],
-                grounded=False,
-                level_applied=level,
+                sources=[], grounded=False, level_applied=level,
             )
 
         context_chunks, citations = self.retrieve_context(req.question, req.equipment_id)
         if not context_chunks:
             return AIQuestionResponse(
                 answer=(
-                    "I could not find a relevant document in the current project archive "
-                    "for this question. I do not want to guess. Try a more specific "
+                    "I could not find a sufficiently relevant passage in the current "
+                    "project archive. I do not want to guess. Try a more specific "
                     "question or choose an exhibit with available records."
                 ),
-                sources=[],
-                grounded=False,
-                level_applied=level,
+                sources=[], grounded=False, level_applied=level,
             )
 
-        persona_guide = {
-            "kid": (
-                "Explain in short, simple sentences suitable for a young learner. "
-                "Use clear analogies only when they are supported by the context."
-            ),
-            "explorer": (
-                "Give an engaging explanation for a middle-school or high-school learner, "
-                "introducing technical terms in plain language."
-            ),
-            "scientist": (
-                "Use precise engineering and scientific terminology. Distinguish facts "
-                "stated in the documents from reasonable interpretation."
-            ),
-        }
-
-        system_prompt = f"""You are the AI Space Historian for SPACE LEGACY, an educational museum.
-Audience level: {level}. {persona_guide[level]}
-
-Evidence rules:
-1. Answer only from the supplied archive excerpts.
-2. If the excerpts do not answer the question, say that the current archive does not contain enough information.
-3. Never invent dates, measurements, mission outcomes, quotations, or source details.
-4. Do not imply that an answer is independently verified beyond the cited excerpts.
-5. Answer in the same language as the student's question.
-6. Keep the explanation focused and age-appropriate.
+        persona = {
+            "kid": "Use short, simple sentences and explain technical terms.",
+            "explorer": "Give a clear educational explanation and define technical terms.",
+            "scientist": "Use precise scientific language and distinguish source facts from interpretation.",
+        }[level]
+        system_prompt = f"""You are the AI Space Historian for an educational museum.
+{persona}
+Answer only using the archive excerpts below. If they do not answer the question,
+say the archive does not contain enough information. Do not add outside facts,
+dates, measurements, or inferred mission details. Answer in the question's language.
+Keep claims close to the wording and facts in the excerpts.
 
 ARCHIVE EXCERPTS:
 {chr(10).join(context_chunks)}
 """
-
         if settings.GEMINI_API_KEY:
             try:
                 from google import genai
-
                 client = genai.Client(api_key=settings.GEMINI_API_KEY)
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model=settings.GEMINI_MODEL,
                     contents=f"{system_prompt}\n\nStudent question: {req.question}",
                 )
-                if response and response.text:
+                answer = response.text.strip() if response and response.text else ""
+                if answer and _answer_has_evidence(answer, context_chunks):
                     return AIQuestionResponse(
-                        answer=response.text.strip(),
-                        sources=citations[:3],
-                        grounded=True,
-                        level_applied=level,
+                        answer=answer, sources=citations[:3],
+                        grounded=True, level_applied=level,
                     )
             except Exception:
-                # A transparent excerpt-based fallback is safer than a
-                # fabricated mission-specific answer.
                 pass
 
         excerpt = context_chunks[0].strip()
@@ -259,13 +273,11 @@ ARCHIVE EXCERPTS:
             excerpt = excerpt[:900].rsplit(" ", 1)[0] + "…"
         return AIQuestionResponse(
             answer=(
-                "I found a relevant passage in the project archive, but the AI "
-                "explanation service is unavailable right now. Here is the retrieved "
-                f"record excerpt:\n\n{excerpt}"
+                "I found a relevant archive passage, but I could not verify a generated "
+                "explanation against the retrieved evidence. Here is the source excerpt "
+                "instead:\n\n" + excerpt
             ),
-            sources=citations[:3],
-            grounded=True,
-            level_applied=level,
+            sources=citations[:3], grounded=False, level_applied=level,
         )
 
 

@@ -15,7 +15,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-
 where npm >nul 2>nul
 if errorlevel 1 (
     echo ERROR: Node.js / npm was not found on PATH.
@@ -26,10 +25,18 @@ if errorlevel 1 (
 set "ROOT=%~dp0"
 set "PYTHONPATH=%ROOT%backend"
 
-echo [1/4] Preparing backend database...
-if not exist "%ROOT%backend\data\space_legacy.db" (
+echo [1/5] Installing/checking backend dependencies...
+python -m pip install -r "%ROOT%backendequirements.txt"
+if errorlevel 1 (
+    echo ERROR: Backend dependency installation failed.
+    pause
+    exit /b 1
+)
+
+echo [2/5] Preparing backend database...
+if not exist "%ROOT%backenddataspace_legacy.db" (
     pushd "%ROOT%backend"
-    python scripts\seed_database.py
+    python scriptsseed_database.py
     if errorlevel 1 (
         echo ERROR: Database initialization failed.
         popd
@@ -41,9 +48,9 @@ if not exist "%ROOT%backend\data\space_legacy.db" (
     echo Existing database found; keeping current local data.
 )
 
-echo [2/4] Checking the vector index...
+echo [3/5] Checking the vector index...
 pushd "%ROOT%backend"
-python scripts\build_vector_index.py
+python scriptsuild_vector_index.py
 if errorlevel 1 (
     echo ERROR: Vector index preparation failed.
     popd
@@ -52,10 +59,11 @@ if errorlevel 1 (
 )
 popd
 
-echo [3/4] Installing frontend dependencies when needed...
-if not exist "%ROOT%frontend\node_modules" (
+echo [4/5] Installing frontend dependencies when needed...
+if not exist "%ROOT%frontend
+ode_modules" (
     pushd "%ROOT%frontend"
-    call npm install
+    call npm ci
     if errorlevel 1 (
         echo ERROR: Frontend dependency installation failed.
         popd
@@ -65,7 +73,7 @@ if not exist "%ROOT%frontend\node_modules" (
     popd
 )
 
-echo [4/4] Starting application...
+echo [5/5] Starting application...
 start "SPACE LEGACY - Backend API" cmd /k "cd /d ""%ROOT%backend"" && set PYTHONPATH=%ROOT%backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
 timeout /t 3 /nobreak >nul
 start "SPACE LEGACY - Frontend" cmd /k "cd /d ""%ROOT%frontend"" && npm run dev"
