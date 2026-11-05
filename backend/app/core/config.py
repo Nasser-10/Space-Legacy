@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     class Config:
         case_sensitive = True
-        env_file = ".env"
+        env_file = str(BASE_DIR.parent / ".env")
         extra = "allow"
 
 
