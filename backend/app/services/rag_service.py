@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -63,16 +64,25 @@ STOP_WORDS = {
 }
 
 
+def _normalize_arabic(token: str) -> str:
+    """Normalize common Arabic spelling variants without discarding the original token."""
+    token = unicodedata.normalize("NFKC", token)
+    token = re.sub(r"[\u064B-\u065F\u0670\u0640]", "", token)
+    return token.translate(str.maketrans({
+        "أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي",
+    }))
+
+
 def _tokens(text: str) -> set[str]:
-    tokens = {
+    raw_tokens = {
         token for token in re.findall(r"[\w]+", text.casefold(), flags=re.UNICODE)
         if len(token) > 2 and token not in STOP_WORDS
     }
-    expanded = set(tokens)
-    for token in tokens:
+    normalized_tokens = {_normalize_arabic(token) for token in raw_tokens}
+    expanded = set(raw_tokens) | normalized_tokens
+    for token in normalized_tokens:
         expanded.update(ARABIC_QUERY_EXPANSIONS.get(token, set()))
     return expanded
-
 
 def _answer_has_evidence(answer: str, chunks: List[str]) -> bool:
     """Conservative lexical support check; not a substitute for human fact-checking."""
