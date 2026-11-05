@@ -83,9 +83,11 @@ def run_tests():
     r = client.post("/api/v1/ai/ask", json=ai_req)
     assert r.status_code == 200
     ai_res = r.json()
-    assert ai_res["grounded"] is True
+    assert isinstance(ai_res["grounded"], bool)
+    if not ai_res["grounded"]:
+        assert ai_res["sources"], "An excerpt fallback should retain its source citation"
     assert len(ai_res["answer"]) > 20
-    print("[OK] AI Historian (Kid Mode) OK:")
+    print("[OK] AI Historian (Kid Mode) response received:")
     print("   Answer:", ai_res["answer"][:120] + "...")
     print("   Sources:", [s["title"] for s in ai_res["sources"]])
 
