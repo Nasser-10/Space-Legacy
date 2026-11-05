@@ -33,6 +33,8 @@ def test_equipment_selection_does_not_create_keyword_relevance(tmp_path):
 
 def test_arabic_and_english_tokenization():
     assert "أبولو" in _tokens("ما هي مهمة أبولو 11؟")
+    assert "moon" in _tokens("ما أهمية الهبوط على القمر؟")
+    assert "mars" in _tokens("ماذا فعل المسبار على المريخ؟")
     assert "apollo" in _tokens("Tell me about Apollo 11")
 
 
