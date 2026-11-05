@@ -31,6 +31,39 @@ def test_equipment_selection_does_not_create_keyword_relevance(tmp_path):
         settings.DOCUMENTS_DIR = original
 
 
+
+def test_relevant_query_matches_only_selected_exhibit(tmp_path):
+    (tmp_path / "apollo_11_descent.md").write_text(
+        "# Propulsion\\nApollo 11 descent engine used hypergolic propellants.", encoding="utf-8"
+    )
+    (tmp_path / "viking_1_lander.md").write_text(
+        "# Power\\nViking 1 used radioisotope generators.", encoding="utf-8"
+    )
+    service = service_without_chroma(tmp_path)
+    from app.core.config import settings
+    original = settings.DOCUMENTS_DIR
+    settings.DOCUMENTS_DIR = str(tmp_path)
+    try:
+        assert service._fallback_keyword_search("Apollo descent engine", "apollo_11_lm")
+        assert service._fallback_keyword_search("Apollo descent engine", "viking_1") == []
+    finally:
+        settings.DOCUMENTS_DIR = original
+
+
+def test_arabic_query_matches_english_archive_terms(tmp_path):
+    (tmp_path / "apollo_11_descent.md").write_text(
+        "# Apollo 11\\nThe lunar landing stage remained on the Moon.", encoding="utf-8"
+    )
+    service = service_without_chroma(tmp_path)
+    from app.core.config import settings
+    original = settings.DOCUMENTS_DIR
+    settings.DOCUMENTS_DIR = str(tmp_path)
+    try:
+        assert service._fallback_keyword_search("أبولو والقمر", "apollo_11_lm")
+    finally:
+        settings.DOCUMENTS_DIR = original
+
+
 def test_arabic_and_english_tokenization():
     assert "أبولو" in _tokens("ما هي مهمة أبولو 11؟")
     assert "moon" in _tokens("ما أهمية الهبوط على القمر؟")
