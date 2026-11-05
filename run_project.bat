@@ -1,27 +1,77 @@
 @echo off
-title SPACE LEGACY - The Forgotten Explorers Launcher
-echo =====================================================================
-echo    SPACE LEGACY: The Forgotten Explorers
-echo    NASA Space Apps Challenge 2026 - Team Musicstarsz
-echo =====================================================================
+setlocal
+title SPACE LEGACY - The Forgotten Explorers
+
+echo ================================================================
+echo   SPACE LEGACY: The Forgotten Explorers
+echo   NASA Space Apps Challenge 2026 - Team Musicstarsz
+echo ================================================================
 echo.
 
-set PATH=C:\Program Files\nodejs;%PATH%
-set PYTHONPATH=%~dp0backend
+where python >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: Python was not found on PATH.
+    echo Install Python 3.12 or later and enable the PATH option.
+    pause
+    exit /b 1
+)
 
-echo [1/3] Verifying SQLite database and ChromaDB vector embeddings...
-start "SPACE LEGACY - Backend API" cmd /k "cd /d %~dp0backend && M:\Python312\python.exe scripts\seed_database.py && M:\Python312\python.exe scripts\build_vector_index.py && M:\Python312\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+where npm >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: Node.js / npm was not found on PATH.
+    pause
+    exit /b 1
+)
 
-echo [2/3] Waiting for Backend to bind port 8000...
-timeout /t 4 /nobreak >nul
+set "ROOT=%~dp0"
+set "PYTHONPATH=%ROOT%backend"
 
-echo [3/3] Launching React Vite Frontend at http://localhost:5173...
-start "SPACE LEGACY - Web Frontend" cmd /k "cd /d %~dp0frontend && npm run dev"
+echo [1/4] Preparing backend database...
+if not exist "%ROOT%backend\data\space_legacy.db" (
+    pushd "%ROOT%backend"
+    python scripts\seed_database.py
+    if errorlevel 1 (
+        echo ERROR: Database initialization failed.
+        popd
+        pause
+        exit /b 1
+    )
+    popd
+) else (
+    echo Existing database found; keeping current local data.
+)
+
+echo [2/4] Checking the vector index...
+pushd "%ROOT%backend"
+python scripts\build_vector_index.py
+if errorlevel 1 (
+    echo ERROR: Vector index preparation failed.
+    popd
+    pause
+    exit /b 1
+)
+popd
+
+echo [3/4] Installing frontend dependencies when needed...
+if not exist "%ROOT%frontend\node_modules" (
+    pushd "%ROOT%frontend"
+    call npm install
+    if errorlevel 1 (
+        echo ERROR: Frontend dependency installation failed.
+        popd
+        pause
+        exit /b 1
+    )
+    popd
+)
+
+echo [4/4] Starting application...
+start "SPACE LEGACY - Backend API" cmd /k "cd /d ""%ROOT%backend"" && set PYTHONPATH=%ROOT%backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
+timeout /t 3 /nobreak >nul
+start "SPACE LEGACY - Frontend" cmd /k "cd /d ""%ROOT%frontend"" && npm run dev"
 
 echo.
-echo =====================================================================
-echo  Web Application running at: http://localhost:5173
-echo  FastAPI Swagger API docs at: http://localhost:8000/api/v1/docs
-echo =====================================================================
+echo Web Application: http://localhost:5173
+echo API Documentation: http://localhost:8000/api/v1/docs
 echo.
-pause
+endlocal

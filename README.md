@@ -15,7 +15,7 @@ Every probe, descent stage, rover, and scientific sensor resting on the Moon and
 1. **Interactive 3D Hardware Inspection:** Rotate, zoom, and explore authentic NASA 3D models with clickable component hotspots.
 2. **Why Was It Left Behind?:** Clear, scientific breakdowns explaining how the rocket equation and mass constraints necessitate leaving hardware in-situ.
 3. **Mission Chronologies:** Interactive milestone timelines tracing the journey from launch pad to extraterrestrial monument.
-4. **AI Space Historian:** A multi-tier conversational tutor (Kid, Explorer, Scientist) powered by Retrieval-Augmented Generation (RAG) over verified NASA technical reports, providing direct citations and strict anti-hallucination guardrails.
+4. **AI Space Historian:** A multi-tier conversational tutor (Kid, Explorer, Scientist) that retrieves excerpts from the project's NASA source archive and displays the associated source links. If no relevant excerpt is found, it reports that limitation instead of inventing an answer.
 5. **Interactive Quizzes & Badging:** Gamified knowledge checks testing student understanding with automated grading and digital achievement badges.
 
 ---
@@ -43,7 +43,7 @@ Every probe, descent stage, rover, and scientific sensor resting on the Moon and
 ## ⚡ Quick Start & Execution
 
 ### Option 1: One-Click Windows Launcher
-Double-click `run_project.bat` in the root directory. It will automatically initialize the database, build the vector index, start the FastAPI server, and launch the Vite frontend.
+Double-click `run_project.bat` in the root directory. It checks that Python and npm are available, initializes the SQLite database when it is missing, checks the vector index, installs frontend packages when needed, and starts both servers. The launcher uses the Python and Node.js versions available on your PATH.
 
 ### Option 2: Manual Terminal Execution
 
@@ -72,6 +72,12 @@ python scripts/test_api_local.py
 ```
 
 ---
+
+## 📌 Current Content Coverage
+
+- **3D models:** Apollo 11 Lunar Module, Viking 1 Lander, and Sojourner have dedicated model assets. Surveyor 3 and Opportunity currently use archival images rather than a mismatched 3D model.
+- **Timelines, quizzes, and exhibit-specific source lists:** currently populated for Apollo 11, Viking 1, and Sojourner. Surveyor 3 and Opportunity still need dedicated, reviewed content before those sections can be described as complete.
+- **AI archive:** citations are attached to the source document used for retrieval. A response without a relevant retrieved document is marked as not grounded.
 
 ## 📚 Official NASA Data Sources & Attribution
 

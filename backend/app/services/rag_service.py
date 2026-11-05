@@ -1,9 +1,50 @@
-import os
 import re
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import Any, Dict, List, Tuple
+
 from app.core.config import settings
 from app.schemas.ai import AIQuestionRequest, AIQuestionResponse, SourceCitation
+
+
+SOURCE_CATALOG = {
+    "apollo_11_descent.md": {
+        "equipment_id": "apollo_11_lm",
+        "title": "Apollo 11 Mission Report (NASA SP-238)",
+        "author": "NASA Manned Spacecraft Center",
+        "year": "1969",
+        "url": "https://history.nasa.gov/alsj/a11/A11_MissionReport.pdf",
+    },
+    "viking_1_lander.md": {
+        "equipment_id": "viking_1",
+        "title": "The Viking Mission to Mars (NASA SP-334)",
+        "author": "NASA Scientific and Technical Information Office",
+        "year": "1976",
+        "url": "https://ntrs.nasa.gov/citations/19770008581",
+    },
+    "sojourner_pathfinder.md": {
+        "equipment_id": "sojourner",
+        "title": "Mars Pathfinder Microrover Operations",
+        "author": "NASA Jet Propulsion Laboratory",
+        "year": "1997",
+        "url": "https://mars.nasa.gov/resources/pathfinder-status",
+    },
+    "planetary_protection_and_heritage.md": {
+        "equipment_id": "all",
+        "title": "NASA Planetary Protection",
+        "author": "NASA Office of Safety and Mission Assurance",
+        "year": "2024",
+        "url": "https://sma.nasa.gov/sma-disciplines/planetary-protection/",
+    },
+}
+
+SPACE_KEYWORDS = {
+    "moon", "lunar", "mars", "martian", "apollo", "viking", "sojourner",
+    "pathfinder", "rover", "lander", "spacecraft", "equipment", "hardware",
+    "orbit", "engine", "nasa", "regolith", "crater", "rocket", "propulsion",
+    "instrument", "battery", "solar", "apxs", "rtg", "space", "planet",
+    "astronomy", "astronaut", "satellite", "survey", "opportunity",
+}
+
 
 class RAGService:
     def __init__(self):
@@ -17,214 +58,215 @@ class RAGService:
             from chromadb.utils import embedding_functions
 
             chroma_dir = Path(settings.CHROMA_PERSIST_DIR)
-            if chroma_dir.exists():
-                self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
-                emb_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-                    model_name="all-MiniLM-L6-v2"
-                )
-                self.collection = self.chroma_client.get_collection(
-                    name="nasa_space_legacy",
-                    embedding_function=emb_fn
-                )
-        except Exception as e:
-            # Fallback to local files if chromadb is not yet initialized
+            if not chroma_dir.exists():
+                return
+
+            self.chroma_client = chromadb.PersistentClient(path=str(chroma_dir))
+            embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+                model_name=settings.EMBEDDING_MODEL_NAME.split("/")[-1]
+            )
+            self.collection = self.chroma_client.get_collection(
+                name="nasa_space_legacy",
+                embedding_function=embedding_fn,
+            )
+        except Exception:
+            # The document-based keyword retriever remains available if Chroma
+            # is missing, empty, or has not been built yet.
             self.collection = None
 
-    def _fallback_keyword_search(self, query: str, equipment_id: str, top_k: int = 3) -> List[Dict[str, Any]]:
+    @staticmethod
+    def _citation_for(source_file: str) -> SourceCitation:
+        metadata = SOURCE_CATALOG.get(source_file, {})
+        return SourceCitation(
+            title=metadata.get("title", Path(source_file).stem.replace("_", " ").title()),
+            author=metadata.get("author", "NASA"),
+            year=metadata.get("year", "Historical archive"),
+            url=metadata.get("url", "https://www.nasa.gov/"),
+        )
+
+    def _fallback_keyword_search(
+        self, query: str, equipment_id: str, top_k: int = 3
+    ) -> List[Dict[str, Any]]:
         docs_dir = Path(settings.DOCUMENTS_DIR)
-        results = []
         if not docs_dir.exists():
-            return results
+            return []
 
-        words = set(re.findall(r'\w+', query.lower()))
-        
+        stop_words = {
+            "what", "when", "where", "which", "who", "why", "how", "does",
+            "did", "was", "were", "the", "and", "for", "with", "from", "this",
+            "that", "its", "their", "about", "tell", "explain", "can", "could",
+        }
+        words = {
+            word for word in re.findall(r"\w+", query.lower())
+            if len(word) > 2 and word not in stop_words
+        }
+        results = []
+
         for md_file in docs_dir.glob("*.md"):
-            with open(md_file, "r", encoding="utf-8") as f:
-                content = f.read()
+            source = SOURCE_CATALOG.get(md_file.name, {})
+            source_equipment_id = source.get("equipment_id", "all")
+            if equipment_id != "all" and source_equipment_id not in {equipment_id, "all"}:
+                continue
 
-            sections = re.split(r'\n(?=#{1,3}\s)', content)
-            for sec in sections:
-                score = sum(1 for w in words if w in sec.lower())
-                # Bonus if equipment id or common name matches
-                if equipment_id != "all" and equipment_id in sec.lower():
-                    score += 3
+            content = md_file.read_text(encoding="utf-8")
+            sections = re.split(r"\n(?=#{1,3}\s)", content)
+            for section in sections:
+                section_lower = section.lower()
+                score = sum(1 for word in words if word in section_lower)
+                if source_equipment_id == equipment_id and equipment_id != "all":
+                    score += 2
                 if score > 0:
                     results.append({
-                        "document": sec.strip(),
+                        "document": section.strip(),
                         "score": score,
-                        "metadata": {
-                            "source_file": md_file.name,
-                            "equipment_id": equipment_id,
-                            "document_title": md_file.stem.replace("_", " ").title()
-                        }
+                        "metadata": {"source_file": md_file.name},
                     })
 
-        results.sort(key=lambda x: x["score"], reverse=True)
+        results.sort(key=lambda item: item["score"], reverse=True)
         return results[:top_k]
 
-    def retrieve_context(self, question: str, equipment_id: str) -> Tuple[List[str], List[SourceCitation]]:
-        retrieved_texts = []
-        citations = []
+    def retrieve_context(
+        self, question: str, equipment_id: str
+    ) -> Tuple[List[str], List[SourceCitation]]:
+        retrieved_texts: List[str] = []
+        citations: List[SourceCitation] = []
+        seen_sources = set()
 
-        # 1. Try ChromaDB
-        if self.collection:
+        if self.collection is not None:
             try:
-                where_filter = None
-                if equipment_id != "all":
-                    where_filter = {"equipment_id": {"$in": [equipment_id, "all"]}}
-
-                results = self.collection.query(
-                    query_texts=[question],
-                    n_results=4,
-                    where=where_filter
-                )
-                
-                if results and results.get("documents") and len(results["documents"][0]) > 0:
-                    docs = results["documents"][0]
-                    metas = results["metadatas"][0]
-                    for d, m in zip(docs, metas):
-                        retrieved_texts.append(d)
-                        citations.append(SourceCitation(
-                            title=m.get("document_title", "NASA Mission Record"),
-                            author="NASA Historical & Technical Archives",
-                            year="Historical Record",
-                            url="https://history.nasa.gov"
-                        ))
-                    return retrieved_texts, citations
+                count = self.collection.count()
+                if count:
+                    where_filter = None
+                    if equipment_id != "all":
+                        where_filter = {"equipment_id": {"$in": [equipment_id, "all"]}}
+                    results = self.collection.query(
+                        query_texts=[question],
+                        n_results=min(4, count),
+                        where=where_filter,
+                    )
+                    documents = (results.get("documents") or [[]])[0]
+                    metadatas = (results.get("metadatas") or [[]])[0]
+                    for document, metadata in zip(documents, metadatas):
+                        if not document:
+                            continue
+                        retrieved_texts.append(document)
+                        source_file = (metadata or {}).get("source_file", "")
+                        citation = self._citation_for(source_file)
+                        if citation.url not in seen_sources:
+                            citations.append(citation)
+                            seen_sources.add(citation.url)
             except Exception:
-                pass
+                # Fall back to raw Markdown files on any index/query issue.
+                retrieved_texts = []
+                citations = []
 
-        # 2. Fallback keyword search over raw files
-        raw_results = self._fallback_keyword_search(question, equipment_id, top_k=3)
-        for r in raw_results:
-            retrieved_texts.append(r["document"])
-            citations.append(SourceCitation(
-                title=r["metadata"].get("document_title", "NASA Mission Record"),
-                author="NASA JPL / History Office",
-                year="Historical Record",
-                url="https://images.nasa.gov"
-            ))
+        if not retrieved_texts:
+            for result in self._fallback_keyword_search(question, equipment_id):
+                retrieved_texts.append(result["document"])
+                source_file = result["metadata"]["source_file"]
+                citation = self._citation_for(source_file)
+                if citation.url not in seen_sources:
+                    citations.append(citation)
+                    seen_sources.add(citation.url)
 
         return retrieved_texts, citations
 
     def ask(self, req: AIQuestionRequest) -> AIQuestionResponse:
-        context_chunks, citations = self.retrieve_context(req.question, req.equipment_id)
-        
-        # Check out of scope (strictly space-related domain keywords)
-        space_keywords = [
-            "moon", "lunar", "mars", "martian", "apollo", "viking", "sojourner", "pathfinder",
-            "rover", "lander", "spacecraft", "equipment", "hardware", "orbit", "engine", "nasa",
-            "regolith", "tranquility", "chryse", "ares", "debris", "relic", "archaeology",
-            "monument", "rocket", "propulsion", "instrument", "battery", "solar", "apxs", "rtg",
-            "space", "planet", "astronomy", "astronaut", "satellite", "crater"
-        ]
-        q_words = set(re.findall(r'\w+', req.question.lower()))
-        has_space_keyword = bool(q_words.intersection(space_keywords))
-        
-        # If no space-related keywords in user query, reject as out-of-scope
-        if not has_space_keyword:
+        level = req.level if req.level in {"kid", "explorer", "scientist"} else "explorer"
+
+        # For the global chat, reject clearly unrelated questions. In an
+        # equipment-specific chat, short follow-ups such as "why was it left?"
+        # are valid because the selected exhibit supplies the subject.
+        query_words = set(re.findall(r"\w+", req.question.lower()))
+        if req.equipment_id == "all" and not query_words.intersection(SPACE_KEYWORDS):
             return AIQuestionResponse(
-                answer="I am the NASA Space Historian dedicated to missions and equipment on the Moon and Mars! While that is an interesting question, I only have records regarding space exploration history and robotic hardware. Ask me anything about the Apollo landers, Viking, Sojourner, or why these explorers remain on other worlds!",
+                answer=(
+                    "I am the AI Space Historian for this museum. I can help with "
+                    "NASA missions, lunar and Martian equipment, mission history, "
+                    "and the science behind these explorers."
+                ),
                 sources=[],
                 grounded=False,
-                level_applied=req.level
+                level_applied=level,
             )
 
-        context_joined = "\n\n---\n\n".join(context_chunks) if context_chunks else "No specific documents found."
+        context_chunks, citations = self.retrieve_context(req.question, req.equipment_id)
+        if not context_chunks:
+            return AIQuestionResponse(
+                answer=(
+                    "I could not find a relevant document in the current project archive "
+                    "for this question. I do not want to guess. Try a more specific "
+                    "question or choose an exhibit with available records."
+                ),
+                sources=[],
+                grounded=False,
+                level_applied=level,
+            )
 
-        # Persona instructions
         persona_guide = {
-            "kid": "Speak in an enthusiastic, warm, storytelling tone suitable for an 8-to-10-year-old. Use vivid analogies, simple everyday words, exclamation marks, and keep sentences friendly and short.",
-            "explorer": "Provide clear, engaging, middle-school level storytelling combining wonder with authentic scientific names and historical context.",
-            "scientist": "Use formal engineering terminology, precise propulsion/avionics details (DPS, APXS, RTG), orbital mechanics principles, and exact mission dates."
+            "kid": (
+                "Explain in short, simple sentences suitable for a young learner. "
+                "Use clear analogies only when they are supported by the context."
+            ),
+            "explorer": (
+                "Give an engaging explanation for a middle-school or high-school learner, "
+                "introducing technical terms in plain language."
+            ),
+            "scientist": (
+                "Use precise engineering and scientific terminology. Distinguish facts "
+                "stated in the documents from reasonable interpretation."
+            ),
         }
-        level_instruction = persona_guide.get(req.level, persona_guide["explorer"])
 
-        system_prompt = f"""You are the official "AI Space Historian" for SPACE LEGACY, an educational virtual museum celebrating NASA's historical robotic equipment on the Moon and Mars.
+        system_prompt = f"""You are the AI Space Historian for SPACE LEGACY, an educational museum.
+Audience level: {level}. {persona_guide[level]}
 
-Your purpose is to explain the history, science, and engineering of these missions to students.
-Tone & Persona Guide: {level_instruction}
+Evidence rules:
+1. Answer only from the supplied archive excerpts.
+2. If the excerpts do not answer the question, say that the current archive does not contain enough information.
+3. Never invent dates, measurements, mission outcomes, quotations, or source details.
+4. Do not imply that an answer is independently verified beyond the cited excerpts.
+5. Answer in the same language as the student's question.
+6. Keep the explanation focused and age-appropriate.
 
-IMPORTANT GROUNDING RULES:
-1. Base your answer strictly on the provided NASA HISTORICAL CONTEXT excerpts.
-2. If the excerpts do not contain the answer, say honestly that NASA records for this specific query are not in your archives.
-3. NEVER refer to this equipment as "garbage" or "space junk". Explain the physics (rocket equation, mass constraints) of why it remains in-situ as an honorable scientific monument.
-4. Keep the response focused, inspiring, and scientifically accurate.
-
-NASA HISTORICAL CONTEXT:
-{context_joined}
+ARCHIVE EXCERPTS:
+{chr(10).join(context_chunks)}
 """
 
-        # Try Gemini API if key is present
         if settings.GEMINI_API_KEY:
             try:
                 from google import genai
+
                 client = genai.Client(api_key=settings.GEMINI_API_KEY)
                 response = client.models.generate_content(
-                    model="gemini-1.5-flash",
-                    contents=[
-                        {"role": "user", "parts": [{"text": f"{system_prompt}\n\nStudent Question: {req.question}"}]}
-                    ]
+                    model="gemini-2.5-flash",
+                    contents=f"{system_prompt}\n\nStudent question: {req.question}",
                 )
                 if response and response.text:
                     return AIQuestionResponse(
                         answer=response.text.strip(),
-                        sources=citations[:2],
+                        sources=citations[:3],
                         grounded=True,
-                        level_applied=req.level
+                        level_applied=level,
                     )
-            except Exception as e:
-                pass  # Fall through to deterministic template generation
+            except Exception:
+                # A transparent excerpt-based fallback is safer than a
+                # fabricated mission-specific answer.
+                pass
 
-        # Deterministic grounded fallback generation (zero-quota / offline resilient)
-        answer = self._generate_grounded_fallback(req.question, req.level, req.equipment_id, context_chunks)
+        excerpt = context_chunks[0].strip()
+        if len(excerpt) > 900:
+            excerpt = excerpt[:900].rsplit(" ", 1)[0] + "…"
         return AIQuestionResponse(
-            answer=answer,
-            sources=citations[:2],
+            answer=(
+                "I found a relevant passage in the project archive, but the AI "
+                "explanation service is unavailable right now. Here is the retrieved "
+                f"record excerpt:\n\n{excerpt}"
+            ),
+            sources=citations[:3],
             grounded=True,
-            level_applied=req.level
+            level_applied=level,
         )
 
-    def _generate_grounded_fallback(self, question: str, level: str, equipment_id: str, context_chunks: List[str]) -> str:
-        q_lower = question.lower()
-
-        # Apollo 11 why left
-        if "why" in q_lower and ("apollo" in q_lower or equipment_id == "apollo_11_lm"):
-            if level == "kid":
-                return "Great question! When astronauts Neil Armstrong and Buzz Aldrin blasted off from the Moon to fly home, they used the bottom half (the Descent Stage) as a launch pad! Taking that heavy bottom part home would have needed way too much rocket fuel. Leaving it turned it into a permanent trophy of humanity's greatest adventure!"
-            elif level == "scientist":
-                return "The Apollo 11 LM Descent Stage served as a stationary launch platform and thrust deflector for the Ascent Stage. Under Tsiolkovsky's Rocket Equation, returning the dry mass of the descent engine and landing gear would have imposed exponential propellant mass penalties that exceeded Saturn V payload margins. It remains at Tranquility Base as a protected historic archaeological site."
-            else:
-                return "The Apollo 11 Descent Stage was intentionally left at Tranquility Base because hauling its heavy landing legs and rocket engine back to orbit would have required an immense amount of extra fuel that the spacecraft could not carry. Instead, it served as a launch pad for the astronauts to lift off safely, becoming our first historic monument on the Moon!"
-
-        # Sojourner why stopped / left
-        if "sojourner" in q_lower or equipment_id == "sojourner":
-            if level == "kid":
-                return "Sojourner was a brave little rover about the size of a microwave oven! She was only designed to last 7 days, but kept rolling for 83 whole days! She stopped because her big buddy, the Pathfinder station, got too cold during freezing Martian nights and its battery fell asleep. Sojourner rests in Ares Vallis like an alien explorer hero!"
-            elif level == "scientist":
-                return "Sojourner concluded operations on Sol 83 after outlasting its 7-sol nominal lifespan by 12x. Because Sojourner relied on UHF proximity communications through the Pathfinder lander station, the mission terminated when Pathfinder's secondary batteries suffered cyclic thermal degradation. Sojourner's rocker-bogie chassis and APXS payload remain intact at the Carl Sagan Memorial Station."
-            else:
-                return "Sojourner was a groundbreaking microrover that operated for 83 days on Mars—way beyond its 7-day mission goal! It didn't break down; rather, the Pathfinder lander that relayed its messages to Earth ran out of battery due to freezing night temperatures. Sojourner remains peacefully parked on the sands of Ares Vallis."
-
-        # Viking 1
-        if "viking" in q_lower or equipment_id == "viking_1":
-            if level == "kid":
-                return "Viking 1 was a robotic science lab that sat on three sturdy legs on Mars! It worked for more than 6 years! It stopped talking to us in 1982 because a computer update accidentally pointed its antenna away from Earth. It's still sitting on the Plains of Gold on Mars!"
-            elif level == "scientist":
-                return "Viking 1 operated on Chryse Planitia from July 1976 to November 1982 (2,245 sols), powered by dual SNAP-19 RTGs. Operations ceased when an uplink software patch inadvertently overwrote antenna tracking vectors. Renamed the Thomas Mutch Memorial Station, it remains preserved in the dry Martian atmosphere."
-            else:
-                return "Viking 1 operated on Mars for over 6 years! Powered by nuclear radioisotope generators (RTGs), it survived freezing winters and global dust storms until 1982, when an antenna command error broke contact. It remains preserved in Chryse Planitia as an extraterrestrial memorial station."
-
-        # General / context fallback
-        if context_chunks:
-            snippet = context_chunks[0][:300].strip() + "..."
-            if level == "kid":
-                return f"Here is what our NASA space records tell us: {snippet} Isn't space science incredible?"
-            elif level == "scientist":
-                return f"Archival mission records document the following telemetry and historical record: {snippet}"
-            else:
-                return f"According to verified NASA mission archives: {snippet} This equipment represents an important step in robotic planetary exploration."
-
-        return "According to NASA's historical archives, equipment left on the Moon and Mars served crucial scientific and exploration objectives, proving engineering feasibility while resting as historic milestones of human curiosity!"
 
 rag_service = RAGService()

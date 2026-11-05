@@ -211,7 +211,7 @@
       "dimensions": "3 m tall tripod structure with 4.3 m leg circle",
       "why_left_behind": "Robotic precursor mission sent without return propulsion. Operating until its solar batteries froze during the two-week lunar night. Uniquely, Apollo 12 astronauts landed 160 meters away in November 1969, inspected the lander, and retrieved its television camera and scoop to examine the effects of 2.5 years of space radiation and micrometeoroids on Earth.",
       "scientific_legacy": "Provided the first mechanical surface bearing and trenching analysis of lunar regolith. Its retrieved camera provided priceless data on how metals, glass, and lubricants survive long-term lunar exposure.",
-      "model_glb_url": "/models/apollo_11_lm.glb",
+      "model_glb_url": null,
       "fallback_image_urls": [
         "https://images-assets.nasa.gov/image/as12-48-7133/as12-48-7133~orig.jpg"
       ],
@@ -235,7 +235,7 @@
       "dimensions": "1.5 m high x 2.3 m wide x 1.6 m long",
       "why_left_behind": "Designed for a 90-sol mission, Opportunity drove an incredible 45.16 kilometers over 14.5 years. In June 2018, a catastrophic global dust storm blanketed Mars, blotting out sunlight and preventing solar panels from recharging the batteries. The rover entered low-power hibernation and succumbed to unrecoverable cold soak.",
       "scientific_legacy": "Discovered hematite 'blueberries' and sulfate evaporites proving that liquid, drinkable-quality groundwater once flowed across ancient Mars.",
-      "model_glb_url": "/models/sojourner.glb",
+      "model_glb_url": null,
       "fallback_image_urls": [
         "https://images-assets.nasa.gov/image/PIA19114/PIA19114~orig.jpg"
       ],
@@ -246,31 +246,106 @@
     {
       "equipment_id": "apollo_11_lm",
       "events": [
-        { "date": "1969-07-16", "title": "Launch from Kennedy Space Center", "description": "Saturn V rocket lifts Apollo 11 crew and hardware toward the Moon.", "category": "launch" },
-        { "date": "1969-07-20 20:17 UTC", "title": "Touchdown at Tranquility Base", "description": "Descent stage engine shuts down. 'Houston, Tranquility Base here. The Eagle has landed.'", "category": "landing" },
-        { "date": "1969-07-21 02:56 UTC", "title": "Historic First Moonwalk", "description": "Armstrong and Aldrin step onto the surface, deploy EASEP experiments, and unveil the commemorative plaque.", "category": "surface_ops" },
-        { "date": "1969-07-21 17:54 UTC", "title": "Ascent Stage Liftoff", "description": "Ascent stage ignites, using the Descent Stage as its launch platform to return the crew to orbit.", "category": "departure" },
-        { "date": "1969-Present", "title": "Permanent In-Situ Historic Monument", "description": "Descent stage remains undisturbed; laser retroreflector still active for lunar ranging.", "category": "legacy" }
+        {
+          "date": "1969-07-16",
+          "title": "Launch from Kennedy Space Center",
+          "description": "Saturn V rocket lifts Apollo 11 crew and hardware toward the Moon.",
+          "category": "launch"
+        },
+        {
+          "date": "1969-07-20 20:17 UTC",
+          "title": "Touchdown at Tranquility Base",
+          "description": "Descent stage engine shuts down. 'Houston, Tranquility Base here. The Eagle has landed.'",
+          "category": "landing"
+        },
+        {
+          "date": "1969-07-21 02:56 UTC",
+          "title": "Historic First Moonwalk",
+          "description": "Armstrong and Aldrin step onto the surface, deploy EASEP experiments, and unveil the commemorative plaque.",
+          "category": "surface_ops"
+        },
+        {
+          "date": "1969-07-21 17:54 UTC",
+          "title": "Ascent Stage Liftoff",
+          "description": "Ascent stage ignites, using the Descent Stage as its launch platform to return the crew to orbit.",
+          "category": "departure"
+        },
+        {
+          "date": "1969-Present",
+          "title": "Permanent In-Situ Historic Monument",
+          "description": "Descent stage remains undisturbed; laser retroreflector still active for lunar ranging.",
+          "category": "legacy"
+        }
       ]
     },
     {
       "equipment_id": "viking_1",
       "events": [
-        { "date": "1975-08-20", "title": "Launch from Cape Canaveral", "description": "Titan IIIE/Centaur launches Viking 1 on an 11-month interplanetary transit.", "category": "launch" },
-        { "date": "1976-06-19", "title": "Mars Orbit Insertion", "description": "Orbiter maps candidate landing sites to confirm landing safety in Chryse Planitia.", "category": "orbit" },
-        { "date": "1976-07-20 11:53 UTC", "title": "Soft Touchdown on Mars", "description": "Parachute and three terminal descent monopropellant engines achieve safe touchdown.", "category": "landing" },
-        { "date": "1982-11-11", "title": "Final Transmission", "description": "A software patch overwrites antenna orientation, severing the ground uplink.", "category": "mission_end" },
-        { "date": "1984", "title": "Designated Thomas Mutch Memorial Station", "description": "Formally christened in honor of Viking imaging science team leader.", "category": "legacy" }
+        {
+          "date": "1975-08-20",
+          "title": "Launch from Cape Canaveral",
+          "description": "Titan IIIE/Centaur launches Viking 1 on an 11-month interplanetary transit.",
+          "category": "launch"
+        },
+        {
+          "date": "1976-06-19",
+          "title": "Mars Orbit Insertion",
+          "description": "Orbiter maps candidate landing sites to confirm landing safety in Chryse Planitia.",
+          "category": "orbit"
+        },
+        {
+          "date": "1976-07-20 11:53 UTC",
+          "title": "Soft Touchdown on Mars",
+          "description": "Parachute and three terminal descent monopropellant engines achieve safe touchdown.",
+          "category": "landing"
+        },
+        {
+          "date": "1982-11-11",
+          "title": "Final Transmission",
+          "description": "A software patch overwrites antenna orientation, severing the ground uplink.",
+          "category": "mission_end"
+        },
+        {
+          "date": "1984",
+          "title": "Designated Thomas Mutch Memorial Station",
+          "description": "Formally christened in honor of Viking imaging science team leader.",
+          "category": "legacy"
+        }
       ]
     },
     {
       "equipment_id": "sojourner",
       "events": [
-        { "date": "1996-12-04", "title": "Delta II Launch", "description": "Mars Pathfinder spacecraft launches on its journey to the Red Planet.", "category": "launch" },
-        { "date": "1997-07-04", "title": "Airbag Assisted Landing", "description": "Pathfinder bounces onto Ares Vallis cushioned by giant airbags, then deflates petals.", "category": "landing" },
-        { "date": "1997-07-05", "title": "Sojourner Rollout", "description": "Sojourner rolls down ramps onto Martian regolith; first wheels on Mars.", "category": "surface_ops" },
-        { "date": "1997-09-27", "title": "Last Telemetry Packet", "description": "Base station battery exhausts due to repeated night freezing; communication closes.", "category": "mission_end" },
-        { "date": "Present", "title": "Silent Sentinel of Ares Vallis", "description": "Remains in pristine condition on the hyper-arid, cold Martian desert.", "category": "legacy" }
+        {
+          "date": "1996-12-04",
+          "title": "Delta II Launch",
+          "description": "Mars Pathfinder spacecraft launches on its journey to the Red Planet.",
+          "category": "launch"
+        },
+        {
+          "date": "1997-07-04",
+          "title": "Airbag Assisted Landing",
+          "description": "Pathfinder bounces onto Ares Vallis cushioned by giant airbags, then deflates petals.",
+          "category": "landing"
+        },
+        {
+          "date": "1997-07-05",
+          "title": "Sojourner Rollout",
+          "description": "Sojourner rolls down ramps onto Martian regolith; first wheels on Mars.",
+          "category": "surface_ops"
+        },
+        {
+          "date": "1997-09-27",
+          "title": "Last Telemetry Packet",
+          "description": "Base station battery exhausts due to repeated night freezing; communication closes.",
+          "category": "mission_end"
+        },
+        {
+          "date": "Present",
+          "title": "Silent Sentinel of Ares Vallis",
+          "description": "Remains in pristine condition on the hyper-arid, cold Martian desert.",
+          "category": "legacy"
+        }
       ]
     }
   ],
