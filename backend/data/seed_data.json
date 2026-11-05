@@ -1,0 +1,494 @@
+{
+  "missions": [
+    {
+      "mission_id": "apollo_11",
+      "name": "Apollo 11",
+      "program": "Apollo Program",
+      "target_body": "moon",
+      "launch_date": "1969-07-16",
+      "landing_date": "1969-07-20",
+      "end_date": "1969-07-24",
+      "objective_summary": "First crewed lunar landing mission, achieving President Kennedy's national goal of landing humans on the Moon and returning them safely to Earth."
+    },
+    {
+      "mission_id": "viking_1",
+      "name": "Viking 1",
+      "program": "Viking Program",
+      "target_body": "mars",
+      "launch_date": "1975-08-20",
+      "landing_date": "1976-07-20",
+      "end_date": "1982-11-11",
+      "objective_summary": "First successful long-duration Mars surface mission, obtaining high-resolution imagery, characterising atmospheric composition, and conducting in-situ biology experiments."
+    },
+    {
+      "mission_id": "mars_pathfinder",
+      "name": "Mars Pathfinder",
+      "program": "Discovery Program",
+      "target_body": "mars",
+      "launch_date": "1996-12-04",
+      "landing_date": "1997-07-04",
+      "end_date": "1997-09-27",
+      "objective_summary": "Technology demonstration proving that low-cost planetary exploration with an airbag landing and mobile microrover (Sojourner) was scientifically viable."
+    },
+    {
+      "mission_id": "surveyor_3",
+      "name": "Surveyor 3",
+      "program": "Surveyor Program",
+      "target_body": "moon",
+      "launch_date": "1967-04-17",
+      "landing_date": "1967-04-20",
+      "end_date": "1967-05-03",
+      "objective_summary": "Robotic lunar soft lander equipped with a surface sampler scoop to analyze lunar soil mechanics in preparation for Apollo crewed landings."
+    },
+    {
+      "mission_id": "mer_b",
+      "name": "Mars Exploration Rover B (Opportunity)",
+      "program": "Mars Exploration Rover",
+      "target_body": "mars",
+      "launch_date": "2003-07-07",
+      "landing_date": "2004-01-25",
+      "end_date": "2018-06-10",
+      "objective_summary": "Geological exploration of Meridiani Planum, searching for rocks and minerals that hold clues to past water activity on ancient Mars."
+    }
+  ],
+  "equipment": [
+    {
+      "equipment_id": "apollo_11_lm",
+      "mission_id": "apollo_11",
+      "official_name": "Apollo 11 Lunar Module Descent Stage (LM-5 Eagle)",
+      "common_name": "Apollo 11 Lunar Module (Eagle)",
+      "celestial_body": "moon",
+      "landing_site_name": "Mare Tranquillitatis (Sea of Tranquility / Tranquility Base)",
+      "latitude": 0.67408,
+      "longitude": 23.47297,
+      "status_category": "historic_monument",
+      "operational_status": "Mission Complete (Preserved In-Situ)",
+      "launch_date": "1969-07-16",
+      "landing_date": "1969-07-20",
+      "mission_end_date": "1969-07-21",
+      "mass_kg": "2,034 kg (dry landed mass on Moon)",
+      "dimensions": "4.22 m high (with legs extended), 9.4 m diagonal span across landing pads",
+      "why_left_behind": "The Descent Stage served as the launch pad and flame deflector for the Ascent Stage when Neil Armstrong and Buzz Aldrin lifted off. According to Tsiolkovsky's rocket equation, hauling the heavy descent stage and landing gear back to lunar orbit would have required an exponentially larger, heavier spacecraft with vastly more fuel. Leaving it behind was an engineering necessity, transforming it into humanity's first historic extraterrestrial monument.",
+      "scientific_legacy": "Provided foundational engineering proof of lunar surface bearing strength and descent engine throttling. Hosted the Early Apollo Scientific Experiments Package (EASEP), including the Passive Seismic Experiment and the Lunar Ranging Retroreflector, which continues to bounce Earth-based laser pulses today.",
+      "model_glb_url": "/models/apollo_11_lm.glb",
+      "fallback_image_urls": [
+        "https://images-assets.nasa.gov/image/as11-40-5927/as11-40-5927~orig.jpg",
+        "https://images-assets.nasa.gov/image/as11-40-5874/as11-40-5874~orig.jpg"
+      ],
+      "hotspots": [
+        {
+          "slot": "hotspot-dps",
+          "position": "0 -0.4 0",
+          "normal": "0 -1 0",
+          "title": "Descent Propulsion System (DPS)",
+          "description": "A throttleable rocket engine (10,500 lbf down to 1,050 lbf) built by TRW, allowing manual hovering and soft touchdown."
+        },
+        {
+          "slot": "hotspot-plaque",
+          "position": "0.3 -0.2 0.8",
+          "normal": "0 0 1",
+          "title": "Historic Commemorative Plaque",
+          "description": "Stainless steel plaque on the forward ladder leg: 'Here men from the planet Earth first set foot upon the Moon July 1969, A.D. We came in peace for all mankind.'"
+        },
+        {
+          "slot": "hotspot-pads",
+          "position": "1.2 -0.8 1.2",
+          "normal": "0 1 0",
+          "title": "Lunar Contact Sensing Probes & Footpads",
+          "description": "5.6-foot wire probes beneath the dish footpads illuminated the 'Lunar Contact' cockpit light when touching the regolith."
+        }
+      ]
+    },
+    {
+      "equipment_id": "viking_1",
+      "mission_id": "viking_1",
+      "official_name": "Viking Lander 1 (Thomas Mutch Memorial Station)",
+      "common_name": "Viking 1 Lander",
+      "celestial_body": "mars",
+      "landing_site_name": "Chryse Planitia (Plains of Gold)",
+      "latitude": 22.697,
+      "longitude": 312.05,
+      "status_category": "historic_monument",
+      "operational_status": "Mission Complete (Preserved In-Situ)",
+      "launch_date": "1975-08-20",
+      "landing_date": "1976-07-20",
+      "mission_end_date": "1982-11-11",
+      "mass_kg": "572 kg (landed dry mass)",
+      "dimensions": "3 m across (hexagonal aluminum frame), 2.1 m high",
+      "why_left_behind": "Viking 1 was a purely stationary robotic surface laboratory. The 1970s technology architecture possessed neither the propulsion mass nor the sample-capture systems required to launch off the Martian surface. It operated for over 6 years (2,245 Martian sols) until an errant ground uplink command accidentally overwrote antenna tracking software in November 1982, terminating communications.",
+      "scientific_legacy": "First operational lander on Mars to transmit color panoramic surface images, continuous weather telemetry over multiple Martian years, and perform direct organic analysis and biology metabolic assays of Martian soil.",
+      "model_glb_url": "/models/viking_1.glb",
+      "fallback_image_urls": [
+        "https://images-assets.nasa.gov/image/PIA00563/PIA00563~orig.jpg",
+        "https://images-assets.nasa.gov/image/PIA02978/PIA02978~orig.jpg"
+      ],
+      "hotspots": [
+        {
+          "slot": "hotspot-sampler",
+          "position": "0.6 0.1 0.4",
+          "normal": "1 0 0",
+          "title": "Surface Sampler Boom",
+          "description": "A 3-meter retractable arm with a backhoe collector that trenched Martian soil and dropped samples into onboard biological test chambers."
+        },
+        {
+          "slot": "hotspot-rtg",
+          "position": "-0.5 0.3 -0.2",
+          "normal": "0 1 0",
+          "title": "SNAP-19 RTG Power Units",
+          "description": "Two radioisotope thermoelectric generators fueled by Plutonium-238, supplying ~70 watts of electricity unaffected by dust storms."
+        },
+        {
+          "slot": "hotspot-camera",
+          "position": "0 0.7 0",
+          "normal": "0 1 0",
+          "title": "Facsimile Dual Cameras",
+          "description": "Scanning photodiode cameras that swept 360-degree color panoramas and stereo depth maps of the rock-strewn Chryse landscape."
+        }
+      ]
+    },
+    {
+      "equipment_id": "sojourner",
+      "mission_id": "mars_pathfinder",
+      "official_name": "Mars Pathfinder Microrover Flight Model (Sojourner)",
+      "common_name": "Sojourner Rover",
+      "celestial_body": "mars",
+      "landing_site_name": "Ares Vallis (Carl Sagan Memorial Station)",
+      "latitude": 19.33,
+      "longitude": 326.5,
+      "status_category": "historic_monument",
+      "operational_status": "Mission Complete (Preserved In-Situ)",
+      "launch_date": "1996-12-04",
+      "landing_date": "1997-07-04",
+      "mission_end_date": "1997-09-27",
+      "mass_kg": "11.5 kg (Earth) / 4.3 kg (Mars surface gravity)",
+      "dimensions": "65 cm long x 48 cm wide x 30 cm high (microwave oven size)",
+      "why_left_behind": "Sojourner was designed as a low-cost, 7-day technology demonstrator carried inside the pyramid-shaped Pathfinder lander. It relied entirely on Pathfinder's radio station to relay commands and telemetry to Earth. While Sojourner operated flawlessly for 83 sols (12x its design lifetime), the Pathfinder base station battery succumbed to thermal degradation and freezing, severing the communication link. Sojourner remained dormant beside the station.",
+      "scientific_legacy": "Humanity's first successful planetary rover. Proved that the 6-wheel rocker-bogie mobility suspension could navigate boulder-strewn alien terrain. Used its APXS instrument to analyze the chemical composition of Martian rocks nicknamed 'Barnacle Bill' and 'Yogi'.",
+      "model_glb_url": "/models/sojourner.glb",
+      "fallback_image_urls": [
+        "https://images-assets.nasa.gov/image/PIA01122/PIA01122~orig.jpg",
+        "https://images-assets.nasa.gov/image/PIA00609/PIA00609~orig.jpg"
+      ],
+      "hotspots": [
+        {
+          "slot": "hotspot-apxs",
+          "position": "-0.2 0.05 -0.15",
+          "normal": "0 0 -1",
+          "title": "Alpha Proton X-Ray Spectrometer (APXS)",
+          "description": "Mounted on a deployment mechanism at the rover rear; irradiated rock surfaces with Curium-244 to measure constituent elements."
+        },
+        {
+          "slot": "hotspot-solar",
+          "position": "0 0.12 0",
+          "normal": "0 1 0",
+          "title": "GaAs Solar Array Panel",
+          "description": "A 0.22-square-meter gallium arsenide solar panel generating ~16 Watts of peak power under midday Martian sunlight."
+        },
+        {
+          "slot": "hotspot-wheels",
+          "position": "0.15 -0.1 0.15",
+          "normal": "1 0 0",
+          "title": "Rocker-Bogie 6-Wheel Mobility",
+          "description": "Each wheel had its own drive motor, with cleated aluminum treads designed to climb obstacles larger than the wheel diameter without flipping."
+        }
+      ]
+    },
+    {
+      "equipment_id": "surveyor_3",
+      "mission_id": "surveyor_3",
+      "official_name": "Surveyor 3 Lunar Soft Lander",
+      "common_name": "Surveyor 3",
+      "celestial_body": "moon",
+      "landing_site_name": "Oceanus Procellarum (Ocean of Storms)",
+      "latitude": -3.015,
+      "longitude": -23.418,
+      "status_category": "historic_monument",
+      "operational_status": "Mission Complete (Sampled In-Situ Site)",
+      "launch_date": "1967-04-17",
+      "landing_date": "1967-04-20",
+      "mission_end_date": "1967-05-03",
+      "mass_kg": "281 kg (landed mass)",
+      "dimensions": "3 m tall tripod structure with 4.3 m leg circle",
+      "why_left_behind": "Robotic precursor mission sent without return propulsion. Operating until its solar batteries froze during the two-week lunar night. Uniquely, Apollo 12 astronauts landed 160 meters away in November 1969, inspected the lander, and retrieved its television camera and scoop to examine the effects of 2.5 years of space radiation and micrometeoroids on Earth.",
+      "scientific_legacy": "Provided the first mechanical surface bearing and trenching analysis of lunar regolith. Its retrieved camera provided priceless data on how metals, glass, and lubricants survive long-term lunar exposure.",
+      "model_glb_url": "/models/apollo_11_lm.glb",
+      "fallback_image_urls": [
+        "https://images-assets.nasa.gov/image/as12-48-7133/as12-48-7133~orig.jpg"
+      ],
+      "hotspots": []
+    },
+    {
+      "equipment_id": "opportunity",
+      "mission_id": "mer_b",
+      "official_name": "Mars Exploration Rover B (Opportunity / MER-1)",
+      "common_name": "Opportunity Rover (Oppy)",
+      "celestial_body": "mars",
+      "landing_site_name": "Meridiani Planum (Eagle Crater to Endeavour Crater)",
+      "latitude": -1.948,
+      "longitude": 354.474,
+      "status_category": "historic_monument",
+      "operational_status": "Mission Complete (Preserved In-Situ)",
+      "launch_date": "2003-07-07",
+      "landing_date": "2004-01-25",
+      "mission_end_date": "2018-06-10",
+      "mass_kg": "185 kg",
+      "dimensions": "1.5 m high x 2.3 m wide x 1.6 m long",
+      "why_left_behind": "Designed for a 90-sol mission, Opportunity drove an incredible 45.16 kilometers over 14.5 years. In June 2018, a catastrophic global dust storm blanketed Mars, blotting out sunlight and preventing solar panels from recharging the batteries. The rover entered low-power hibernation and succumbed to unrecoverable cold soak.",
+      "scientific_legacy": "Discovered hematite 'blueberries' and sulfate evaporites proving that liquid, drinkable-quality groundwater once flowed across ancient Mars.",
+      "model_glb_url": "/models/sojourner.glb",
+      "fallback_image_urls": [
+        "https://images-assets.nasa.gov/image/PIA19114/PIA19114~orig.jpg"
+      ],
+      "hotspots": []
+    }
+  ],
+  "timelines": [
+    {
+      "equipment_id": "apollo_11_lm",
+      "events": [
+        { "date": "1969-07-16", "title": "Launch from Kennedy Space Center", "description": "Saturn V rocket lifts Apollo 11 crew and hardware toward the Moon.", "category": "launch" },
+        { "date": "1969-07-20 20:17 UTC", "title": "Touchdown at Tranquility Base", "description": "Descent stage engine shuts down. 'Houston, Tranquility Base here. The Eagle has landed.'", "category": "landing" },
+        { "date": "1969-07-21 02:56 UTC", "title": "Historic First Moonwalk", "description": "Armstrong and Aldrin step onto the surface, deploy EASEP experiments, and unveil the commemorative plaque.", "category": "surface_ops" },
+        { "date": "1969-07-21 17:54 UTC", "title": "Ascent Stage Liftoff", "description": "Ascent stage ignites, using the Descent Stage as its launch platform to return the crew to orbit.", "category": "departure" },
+        { "date": "1969-Present", "title": "Permanent In-Situ Historic Monument", "description": "Descent stage remains undisturbed; laser retroreflector still active for lunar ranging.", "category": "legacy" }
+      ]
+    },
+    {
+      "equipment_id": "viking_1",
+      "events": [
+        { "date": "1975-08-20", "title": "Launch from Cape Canaveral", "description": "Titan IIIE/Centaur launches Viking 1 on an 11-month interplanetary transit.", "category": "launch" },
+        { "date": "1976-06-19", "title": "Mars Orbit Insertion", "description": "Orbiter maps candidate landing sites to confirm landing safety in Chryse Planitia.", "category": "orbit" },
+        { "date": "1976-07-20 11:53 UTC", "title": "Soft Touchdown on Mars", "description": "Parachute and three terminal descent monopropellant engines achieve safe touchdown.", "category": "landing" },
+        { "date": "1982-11-11", "title": "Final Transmission", "description": "A software patch overwrites antenna orientation, severing the ground uplink.", "category": "mission_end" },
+        { "date": "1984", "title": "Designated Thomas Mutch Memorial Station", "description": "Formally christened in honor of Viking imaging science team leader.", "category": "legacy" }
+      ]
+    },
+    {
+      "equipment_id": "sojourner",
+      "events": [
+        { "date": "1996-12-04", "title": "Delta II Launch", "description": "Mars Pathfinder spacecraft launches on its journey to the Red Planet.", "category": "launch" },
+        { "date": "1997-07-04", "title": "Airbag Assisted Landing", "description": "Pathfinder bounces onto Ares Vallis cushioned by giant airbags, then deflates petals.", "category": "landing" },
+        { "date": "1997-07-05", "title": "Sojourner Rollout", "description": "Sojourner rolls down ramps onto Martian regolith; first wheels on Mars.", "category": "surface_ops" },
+        { "date": "1997-09-27", "title": "Last Telemetry Packet", "description": "Base station battery exhausts due to repeated night freezing; communication closes.", "category": "mission_end" },
+        { "date": "Present", "title": "Silent Sentinel of Ares Vallis", "description": "Remains in pristine condition on the hyper-arid, cold Martian desert.", "category": "legacy" }
+      ]
+    }
+  ],
+  "quizzes": [
+    {
+      "equipment_id": "apollo_11_lm",
+      "questions": [
+        {
+          "question_id": 1,
+          "question_text": "Why was the Apollo 11 Lunar Module Descent Stage left behind on the Moon?",
+          "options": {
+            "a": "It accidentally broke down during the landing.",
+            "b": "It was used as a launch pad, and hauling its mass back would violate rocket fuel limits.",
+            "c": "Astronauts forgot to attach the retrieval cables.",
+            "d": "It contained harmful radioactive fuel that could not enter Earth's atmosphere."
+          },
+          "correct_option": "b",
+          "explanation": "Rocket physics (Tsiolkovsky's Rocket Equation) dictated that carrying the heavy descent engine and landing gear back to lunar orbit would have required an exponentially larger, heavier spacecraft with impossible amounts of fuel."
+        },
+        {
+          "question_id": 2,
+          "question_text": "Which scientific instrument left at Tranquility Base by Apollo 11 is still used by scientists today?",
+          "options": {
+            "a": "The Lunar Laser Ranging Retroreflector",
+            "b": "The Solar Wind Ion Detector",
+            "c": "The Deep Core Drill Rig",
+            "d": "The Helium Balloon Weather Station"
+          },
+          "correct_option": "a",
+          "explanation": "The Lunar Laser Ranging Retroreflector consists of corner-cube prisms that bounce Earth-based laser beams back to measure the exact distance to the Moon to millimeter precision."
+        },
+        {
+          "question_id": 3,
+          "question_text": "What message is inscribed on the stainless steel plaque attached to the Apollo 11 descent ladder?",
+          "options": {
+            "a": "The Moon belongs to the United States of America",
+            "b": "One small step for man, one giant leap for mankind",
+            "c": "We came in peace for all mankind",
+            "d": "To infinity and beyond"
+          },
+          "correct_option": "c",
+          "explanation": "The plaque bears images of Earth's hemispheres and the words: 'Here men from the planet Earth first set foot upon the Moon July 1969, A.D. We came in peace for all mankind.'"
+        },
+        {
+          "question_id": 4,
+          "question_text": "How did the Apollo 11 descent stage land softly without creating a deep crater?",
+          "options": {
+            "a": "Giant parachutes slowed it down in the lunar atmosphere.",
+            "b": "TRW Descent Propulsion System throttled engine thrust from 10,000 down to 1,000 pounds.",
+            "c": "It glided down with wings.",
+            "d": "It landed inside giant bouncy airbags."
+          },
+          "correct_option": "b",
+          "explanation": "Because the Moon has no atmosphere, parachutes cannot work. A throttleable rocket engine adjusted thrust down to 10% to gently cushion touchdown."
+        }
+      ]
+    },
+    {
+      "equipment_id": "viking_1",
+      "questions": [
+        {
+          "question_id": 5,
+          "question_text": "How long did Viking 1 operate on the Martian surface before contact was lost?",
+          "options": {
+            "a": "Exactly 90 days",
+            "b": "Over 6 years (2,245 Martian sols)",
+            "c": "Only 48 hours",
+            "d": "Over 20 years"
+          },
+          "correct_option": "b",
+          "explanation": "Designed for a 90-day nominal mission, Viking 1 operated for over 6 Earth years from July 1976 until November 1982!"
+        },
+        {
+          "question_id": 6,
+          "question_text": "What powered Viking 1 throughout Martian nights and intense dust storms?",
+          "options": {
+            "a": "Lithium AA batteries",
+            "b": "Wind turbines",
+            "c": "Two SNAP-19 Radioisotope Thermoelectric Generators (RTGs)",
+            "d": "Solar panels with wiper blades"
+          },
+          "correct_option": "c",
+          "explanation": "Viking 1 used Plutonium-238 RTGs that produced steady electricity from radioactive decay heat, unaffected by freezing temperatures or dust blocking sunlight."
+        },
+        {
+          "question_id": 7,
+          "question_text": "Why did Viking 1 communication abruptly end in November 1982?",
+          "options": {
+            "a": "A meteorite smashed directly into the lander.",
+            "b": "An uplink software command unintentionally overwrote its antenna pointing memory.",
+            "c": "Its legs sank into quicksand.",
+            "d": "Aliens intercepted its radio transmitter."
+          },
+          "correct_option": "b",
+          "explanation": "A human command uplink error during a battery recharge patch overwrote the antenna orientation code, pointing the high-gain antenna away from Earth forever."
+        },
+        {
+          "question_id": 8,
+          "question_text": "Could Viking 1 drive around the Martian landscape?",
+          "options": {
+            "a": "Yes, it drove 5 kilometers.",
+            "b": "No, it was a stationary three-legged lander with a sampling arm.",
+            "c": "Yes, it hopped on rocket thrusters.",
+            "d": "No, but it floated on water."
+          },
+          "correct_option": "b",
+          "explanation": "Viking 1 was a stationary scientific platform anchored to the surface on three shock-absorbing legs."
+        }
+      ]
+    },
+    {
+      "equipment_id": "sojourner",
+      "questions": [
+        {
+          "question_id": 9,
+          "question_text": "Approximately how large was the Sojourner microrover?",
+          "options": {
+            "a": "As big as a family SUV",
+            "b": "As small as a microwave oven",
+            "c": "As large as a school bus",
+            "d": "As tiny as a smartphone"
+          },
+          "correct_option": "b",
+          "explanation": "Sojourner was 65 cm long and weighed only 11.5 kg (about 25 lbs on Earth, and only 9.5 lbs in Mars gravity) - roughly the size of a microwave oven!"
+        },
+        {
+          "question_id": 10,
+          "question_text": "Why did Sojourner stop communicating with Earth in September 1997?",
+          "options": {
+            "a": "Sojourner's wheels broke on a boulder.",
+            "b": "The Pathfinder base station battery froze and failed, severing the communication relay.",
+            "c": "It fell into an underground cavern.",
+            "d": "It ran out of gasoline."
+          },
+          "correct_option": "b",
+          "explanation": "Sojourner didn't have a direct radio link to Earth; it talked to the Pathfinder lander. When Pathfinder's battery froze from cyclic cold, the relay was severed."
+        },
+        {
+          "question_id": 11,
+          "question_text": "What special suspension system allowed Sojourner to climb over Martian rocks without flipping?",
+          "options": {
+            "a": "Hydraulic spring shocks",
+            "b": "Rocker-bogie 6-wheel suspension",
+            "c": "Rubber caterpillar tracks",
+            "d": "Pneumatic hovercraft cushions"
+          },
+          "correct_option": "b",
+          "explanation": "The rocker-bogie mechanism distributes weight evenly across all six wheels, allowing rovers to climb obstacles larger than a wheel diameter without tipping."
+        },
+        {
+          "question_id": 12,
+          "question_text": "What was the name of Sojourner's main instrument used to analyze Martian rocks?",
+          "options": {
+            "a": "Alpha Proton X-Ray Spectrometer (APXS)",
+            "b": "CheCam Laser Blaster",
+            "c": "Seismic Hammer",
+            "d": "Infrared Microscope"
+          },
+          "correct_option": "a",
+          "explanation": "The APXS deployed against rocks like 'Barnacle Bill' and irradiated them with alpha particles to detect chemical elements."
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "source_id": 1,
+      "equipment_id": "apollo_11_lm",
+      "title": "Apollo 11 Mission Report (NASA SP-238)",
+      "author_or_org": "NASA Manned Spacecraft Center",
+      "publication_year": "1969",
+      "url": "https://history.nasa.gov/alsj/a11/A11_MissionReport.pdf",
+      "source_type": "official_report"
+    },
+    {
+      "source_id": 2,
+      "equipment_id": "apollo_11_lm",
+      "title": "Apollo Lunar Surface Journal: Tranquility Base",
+      "author_or_org": "NASA History Division",
+      "publication_year": "1995",
+      "url": "https://www.nasa.gov/history/alsj/a11/a11.html",
+      "source_type": "historical_archive"
+    },
+    {
+      "source_id": 3,
+      "equipment_id": "viking_1",
+      "title": "The Viking Mission to Mars (NASA SP-334)",
+      "author_or_org": "NASA Scientific and Technical Information Office",
+      "publication_year": "1976",
+      "url": "https://ntrs.nasa.gov/citations/19770008581",
+      "source_type": "technical_report"
+    },
+    {
+      "source_id": 4,
+      "equipment_id": "viking_1",
+      "title": "Viking Lander 1 Master Catalog Record",
+      "author_or_org": "NASA National Space Science Data Center (NSSDCA)",
+      "publication_year": "2024",
+      "url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1975-075C",
+      "source_type": "database"
+    },
+    {
+      "source_id": 5,
+      "equipment_id": "sojourner",
+      "title": "Mars Pathfinder Microrover Operations (JPL Publication D-15555)",
+      "author_or_org": "NASA Jet Propulsion Laboratory",
+      "publication_year": "1997",
+      "url": "https://mars.nasa.gov/resources/pathfinder-status",
+      "source_type": "official_report"
+    },
+    {
+      "source_id": 6,
+      "equipment_id": "sojourner",
+      "title": "Sojourner Microrover Flight Model Science Log",
+      "author_or_org": "NASA Planetary Data System (PDS)",
+      "publication_year": "1998",
+      "url": "https://pds-geosciences.wustl.edu/missions/pathfinder/",
+      "source_type": "science_archive"
+    }
+  ]
+}
