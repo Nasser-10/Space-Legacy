@@ -49,7 +49,8 @@ ARABIC_QUERY_EXPANSIONS = {
     "مريخي": {"martian"}, "ابولو": {"apollo"}, "أبولو": {"apollo"},
     "فيكنج": {"viking"}, "فايكنج": {"viking"}, "سوجورنر": {"sojourner"},
     "باثفايندر": {"pathfinder"}, "روفر": {"rover"}, "مركبة": {"spacecraft"},
-    "المركبة": {"spacecraft"}, "مسبار": {"spacecraft", "lander"},
+    "المركبة": {"spacecraft"}, "مسبار": {"spacecraft", "lander"}, "المسبار": {"spacecraft", "lander"},
+    "الهبوط": {"landing"}, "مرحلة": {"stage"}, "مهمة": {"mission"}, "المهمة": {"mission"},
     "ناسا": {"nasa"}, "صاروخ": {"rocket"}, "مدار": {"orbit"},
     "محرك": {"engine"}, "بطارية": {"battery"},
 }
