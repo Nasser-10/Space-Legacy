@@ -44,6 +44,15 @@ SPACE_KEYWORDS = {
     "instrument", "battery", "solar", "apxs", "rtg", "space", "planet",
     "astronomy", "astronaut", "satellite", "survey", "opportunity",
 }
+ARABIC_QUERY_EXPANSIONS = {
+    "القمر": {"moon", "lunar"}, "قمري": {"lunar"}, "المريخ": {"mars", "martian"},
+    "مريخي": {"martian"}, "ابولو": {"apollo"}, "أبولو": {"apollo"},
+    "فيكنج": {"viking"}, "فايكنج": {"viking"}, "سوجورنر": {"sojourner"},
+    "باثفايندر": {"pathfinder"}, "روفر": {"rover"}, "مركبة": {"spacecraft"},
+    "المركبة": {"spacecraft"}, "مسبار": {"spacecraft", "lander"},
+    "ناسا": {"nasa"}, "صاروخ": {"rocket"}, "مدار": {"orbit"},
+    "محرك": {"engine"}, "بطارية": {"battery"},
+}
 STOP_WORDS = {
     "what", "when", "where", "which", "who", "why", "how", "does", "did",
     "was", "were", "the", "and", "for", "with", "from", "this", "that",
@@ -54,10 +63,14 @@ STOP_WORDS = {
 
 
 def _tokens(text: str) -> set[str]:
-    return {
-        token for token in re.findall(r"[\w]+", text.casefold(), flags=re.UNICODE)
+    tokens = {
+        token for token in re.findall(r"[\\w]+", text.casefold(), flags=re.UNICODE)
         if len(token) > 2 and token not in STOP_WORDS
     }
+    expanded = set(tokens)
+    for token in tokens:
+        expanded.update(ARABIC_QUERY_EXPANSIONS.get(token, set()))
+    return expanded
 
 
 def _answer_has_evidence(answer: str, chunks: List[str]) -> bool:
