@@ -11,7 +11,7 @@ export default function ChatHistorian({ equipmentId = 'all', equipmentName = 'th
       role: 'assistant',
       text: `Greetings explorer! I am the NASA AI Space Historian. Ask me anything about ${equipmentName}, why it was left behind, how its instruments worked, or its historical scientific discoveries!`,
       sources: [],
-      grounded: true,
+      grounded: false,
     },
   ]);
 
@@ -70,7 +70,7 @@ export default function ChatHistorian({ equipmentId = 'all', equipmentName = 'th
             <h3 className="font-display font-bold text-sm text-white flex items-center gap-2">
               <span>AI Space Historian</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-sans">
-                RAG Grounded
+                NASA Mission Archives
               </span>
             </h3>
             <p className="text-[11px] text-slate-400">Powered by NASA Mission Documentation</p>
@@ -135,7 +135,7 @@ export default function ChatHistorian({ equipmentId = 'all', equipmentName = 'th
                 <div className="mt-3 pt-3 border-t border-slate-800/80">
                   <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 mb-1.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Verified Official NASA Sources:</span>
+                    <span>Retrieved archive sources:</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {m.sources.map((s, sIdx) => (

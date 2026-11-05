@@ -4,7 +4,7 @@ const BACKEND_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/
 
 const apiClient = axios.create({
   baseURL: BACKEND_BASE,
-  timeout: 3500,
+  timeout: 20000,
 });
 
 // Cache for seed data fallback
@@ -117,6 +117,7 @@ export const SpaceLegacyAPI = {
     } catch (err) {
       // Local grading fallback
       const seed = await getFallbackData();
+      if (!seed?.quizzes) return null;
       const qz = seed.quizzes.find((item) => item.equipment_id === equipmentId);
       if (!qz) return null;
       let score = 0;
@@ -161,24 +162,15 @@ export const SpaceLegacyAPI = {
         equipment_id: equipmentId,
         question,
         level,
-      });
+      }, { timeout: 60000 });
       return res.data;
     } catch (err) {
       console.warn('AI API endpoint offline, using local educational response');
       return {
         answer:
-          level === 'kid'
-            ? 'NASA sent these brave robotic explorers to discover rocks, look for ancient water, and test landing technologies! Even though their batteries ran out, they are honored like planetary monuments on the Moon and Mars!'
-            : 'According to official NASA archives, equipment remaining on the lunar and Martian surfaces fulfilled primary scientific objectives and remains in-situ due to rocket propulsion mass limits, preserving the historic record of early planetary exploration.',
-        sources: [
-          {
-            title: 'NASA Historical & Planetary Archives',
-            author: 'NASA History Division',
-            year: 'Historical Record',
-            url: 'https://history.nasa.gov',
-          },
-        ],
-        grounded: true,
+          "The AI archive service is unavailable right now, and I could not verify an answer. Please try again when the backend is available.",
+        sources: [],
+        grounded: false,
         level_applied: level,
       };
     }
