@@ -1,25 +1,26 @@
 # Mars Pathfinder & Sojourner Microrover: Mobile Exploration & Scientific Legacy
 
 ## Overview & Touchdown Site
-On July 4, 1997, the Mars Pathfinder mission touched down in Ares Vallis (19.33° N latitude, 326.5° E longitude), an ancient Martian flood plain chosen for its rock diversity. The landing base station was subsequently dedicated as the **Carl Sagan Memorial Station**. 
-
-Pathfinder deployed **Sojourner**, humanity's first wheeled robotic mobile rover on another celestial body.
+The Mars Pathfinder mission landed in Ares Vallis on July 4, 1997. Its lander was later named the **Carl Sagan Memorial Station**. Pathfinder deployed **Sojourner**, the first rover to operate on the surface of another planet.
 
 ## Why Did Sojourner Remain on Mars?
-Sojourner was built as an experimental technology demonstration under NASA's "Faster, Better, Cheaper" initiative, with an initial design lifetime of only **7 Martian sols** (days). It was carried to Mars folded flat against the inner petal of the triangular Pathfinder lander.
+Sojourner was a technology-demonstration microrover designed for a short initial mission. It communicated with Earth through a radio link to the Pathfinder lander, which relayed the data.
 
-Crucially, Sojourner was a *microrover* (measuring 65 cm long, 48 cm wide, and weighing only 11.5 kg on Earth / 4.3 kg on Mars). Because of its diminutive size:
-1. It carried no direct-to-Earth communication dish. It communicated via an ultra-high-frequency (UHF) radio modem transmitting through the Pathfinder lander base station, which held the high-gain antenna pointed at Earth.
-2. It possessed no ascent rocket, parachute return system, or interplanetary cruise stage.
+Sojourner operated for 83 Martian sols and traveled more than 100 meters while examining nearby rocks and soil. It had no launch system for leaving Mars and no direct Earth-return capability.
 
-Sojourner far exceeded expectations, operating for **83 Martian sols** (12 times its design lifespan), driving over 100 meters, taking 550 photos, and analyzing 15 rock targets. 
+The last data transmission from Pathfinder was received on **September 27, 1997**. This is a useful operational milestone, but it is not identical to the later administrative closure of the mission: NASA/JPL continued attempts to re-establish contact, and JPL's historical record describes the mission's eventual termination in 1998. Therefore, this archive uses September 27, 1997 specifically as the last received data transmission, not as an unqualified official termination date.
 
-On September 27, 1997 (Sol 83), the mission ended not because Sojourner malfunctioned, but because the Pathfinder lander station's silver-zinc secondary battery succumbed to severe cyclic thermal freezing during the cold Martian nights. When the lander stopped functioning, Sojourner's radio relay to Earth was severed. Following its programmed loss-of-signal contingency, Sojourner executed a loop around the lander and parked on the Ares Vallis floodplain, where it remains perfectly preserved today.
+Published Sojourner mass values vary by source and by the mass definition used. This document omits a single definitive mass figure rather than combining incompatible estimates.
 
 ## Engineering Innovations & Rocker-Bogie Suspension
-- **Rocker-Bogie Mechanism:** Designed by JPL engineers, this 6-wheel articulated suspension system has no springs. Instead, it uses two rockers connected to bogies with a differential bar across the chassis. This allows the rover to climb over rocks larger than a single wheel diameter (13 cm) while maintaining all six wheels in contact with uneven ground.
-- **Power:** A 0.22 m² solar array with Gallium Arsenide (GaAs) cells producing 16 Watts of peak electricity, supplemented by non-rechargeable lithium thionyl chloride D-cell backup batteries.
-- **Scientific Payload - APXS:** The Alpha Proton X-Ray Spectrometer (APXS) irradiated target rocks with Curium-244, measuring the backscattered alpha particles and characteristic X-rays. It discovered that rocks named "Barnacle Bill" and "Yogi" were andesitic volcanic rocks, indicating that Mars had experienced complex magma differentiation similar to Earth's continental crust.
+- **Mobility:** The six-wheel rocker-bogie suspension helped the rover traverse uneven terrain while keeping its wheels in contact with the surface.
+- **Power:** Sojourner used a solar array and rechargeable batteries.
+- **Scientific Payload:** The Alpha Proton X-ray Spectrometer (APXS) analyzed the elemental composition of rocks and soil.
 
 ## Heritage Significance
-Sojourner validated the mobility, autonomous hazard avoidance, and thermal architecture that paved the way for larger rovers: Spirit, Opportunity, Curiosity, and Perseverance. It remains an honored historic pioneer of Martian surface exploration.
+Sojourner demonstrated technologies and operational approaches that informed later Mars rover missions, including mobility, surface operations, and autonomous navigation concepts.
+
+## Primary references
+- [NASA Mars Pathfinder mission overview](https://science.nasa.gov/mission/mars-pathfinder/)
+- [NASA/JPL Mars Pathfinder photojournal](https://photojournal.jpl.nasa.gov/mission/Mars%20Pathfinder)
+- [NASA Mars Exploration Program — Pathfinder](https://mars.nasa.gov/mars-exploration/missions/pathfinder/)
